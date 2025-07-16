@@ -10,7 +10,7 @@ st.set_page_config(page_title="Klasifikasi Wortel", page_icon="🥕", layout="ce
 
 # Judul dan Deskripsi
 st.markdown("<h1 style='text-align: center;'>🥕 Klasifikasi Wortel (Good vs Bad)</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center;'>Upload gambar wortel untuk mengetahui apakah wortel tersebut <b>Good</b> atau <b>Bad</b>!</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>Upload gambar wortel untuk mengetahui apakah wortel tersebut termasuk kategori <b>Bagus</b> atau <b>Jelek</b>!</p>", unsafe_allow_html=True)
 
 # Load model
 svm_model = joblib.load("model_carrot.pkl")
@@ -48,9 +48,9 @@ if uploaded_file is not None:
     with col1:
         st.markdown("### 🔎 Hasil Prediksi:")
         if prediction.lower() == "good":
-            st.success(f"Wortel ini diprediksi sebagai: **GOOD** 🟢")
+            st.success(f"Wortel ini diprediksi sebagai: **BAGUS** 🟢")
         else:
-            st.error(f"Wortel ini diprediksi sebagai: **BAD** 🔴")
+            st.error(f"Wortel ini diprediksi sebagai: **JELEK** 🔴")
 
     with col2:
         st.markdown("### 📊 Confidence:")
