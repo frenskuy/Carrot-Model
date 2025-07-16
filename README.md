@@ -18,11 +18,11 @@ Proyek ini berfokus pada pengembangan model machine learning berbasis Support Ve
 ## 📁 Struktur Direktori
 ```bash
 Carrot-Model/
-├── model_carrot.pkl # Model SVM yang telah dilatih
-├── CARROT/ # Folder dataset berisi gambar wortel (good/bad)
-├── app.py # Aplikasi Streamlit untuk deteksi kualitas
-├── train_and_save_model.ipynb # Script pelatihan model
-└── README.md # Dokumentasi ini
+├── model_carrot.pkl             # Model SVM yang telah dilatih
+├── CARROT/                      # Folder dataset berisi gambar wortel (good/bad)
+├── app.py                       # Aplikasi Streamlit untuk deteksi kualitas
+├── train_and_save_model.ipynb   # Script pelatihan model
+└── README.md                    # Dokumentasi ini
 ```
 ---
 
