@@ -5,10 +5,17 @@ import joblib
 from skimage.feature import hog
 from PIL import Image
 
-# Load model
-svm_model = joblib.load("model_carrot.pkl")  # pastikan file ini ada
+# Konfigurasi halaman
+st.set_page_config(page_title="Klasifikasi Wortel", page_icon="🥕", layout="centered")
 
-# Ekstrak fitur HOG
+# Judul dan Deskripsi
+st.markdown("<h1 style='text-align: center;'>🥕 Klasifikasi Wortel (Good vs Bad)</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>Upload gambar wortel untuk mengetahui apakah wortel tersebut <b>Good</b> atau <b>Bad</b>!</p>", unsafe_allow_html=True)
+
+# Load model
+svm_model = joblib.load("model_carrot.pkl")
+
+# Fungsi ekstraksi fitur HOG
 def extract_hog_features(image):
     image = cv2.resize(image, (128, 128))
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -17,23 +24,38 @@ def extract_hog_features(image):
         cells_per_block=(2, 2), block_norm='L2-Hys')
     return features
 
-# Streamlit UI
-st.title("Klasifikasi Wortel (Good vs Bad) 🥕")
-st.write("Upload gambar wortel untuk diklasifikasikan:")
-
-uploaded_file = st.file_uploader("Pilih gambar...", type=["jpg", "png", "jpeg"])
+# Upload gambar
+uploaded_file = st.file_uploader("📤 Upload gambar wortel (jpg, jpeg, png)", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
+    # Tampilkan gambar
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption='Gambar yang diupload', use_column_width=True)
+    st.image(image, caption='📷 Gambar yang diupload', use_container_width=True)
 
-    # Konversi PIL ke OpenCV
-    image_cv = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+    with st.spinner("🔍 Sedang memproses dan mengklasifikasikan gambar..."):
+        # Konversi gambar
+        image_cv = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+        features = extract_hog_features(image_cv).reshape(1, -1)
 
-    # Ekstrak fitur dan prediksi
-    features = extract_hog_features(image_cv).reshape(1, -1)
-    prediction = svm_model.predict(features)[0]
-    confidence = svm_model.predict_proba(features)[0].max()
+        # Prediksi
+        prediction = svm_model.predict(features)[0]
+        confidence = svm_model.predict_proba(features)[0].max()
 
-    st.markdown(f"### Prediksi: `{prediction.upper()}`")
-    st.markdown(f"**Confidence:** {confidence:.2f}")
+    # Hasil prediksi
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("### 🔎 Hasil Prediksi:")
+        if prediction.lower() == "good":
+            st.success(f"Wortel ini diprediksi sebagai: **GOOD** 🟢")
+        else:
+            st.error(f"Wortel ini diprediksi sebagai: **BAD** 🔴")
+
+    with col2:
+        st.markdown("### 📊 Confidence:")
+        st.progress(confidence)
+        st.write(f"**{confidence * 100:.2f}%** keyakinan model terhadap hasil prediksi.")
+
+    st.markdown("---")
+    st.info("Model ini menggunakan fitur HOG + SVM untuk mengklasifikasikan gambar wortel.")
