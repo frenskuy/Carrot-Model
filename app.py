@@ -23,7 +23,7 @@ uploaded_file = st.file_uploader("Unggah gambar wortel", type=["jpg", "png", "jp
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
-    st.image(image, caption='Gambar diunggah', use_column_width=True)
+    st.image(image, caption='Gambar diunggah', use_container_width=True)
     
     features = extract_features_pil(image)
     prediction = model.predict(features)[0]
