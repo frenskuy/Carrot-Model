@@ -6,7 +6,7 @@ from skimage.feature import hog
 from PIL import Image
 
 # Load model
-svm_model = joblib.load("svm_model.pkl")  # pastikan file ini ada
+svm_model = joblib.load("model_carrot.pkl")  # pastikan file ini ada
 
 # Ekstrak fitur HOG
 def extract_hog_features(image):
