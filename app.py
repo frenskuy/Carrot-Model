@@ -26,7 +26,7 @@ if uploaded_file is not None:
     st.image(image, caption='Gambar diunggah', use_container_width=True)
     
     features = extract_features_pil(image)
-    prediction = model.predict(features)[0]
+    prediction = svm.predict(features)[0]
 
     label = "Wortel Baik ✅" if prediction == 1 else "Wortel Buruk ❌"
     st.subheader(f"Prediksi: {label}")
