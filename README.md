@@ -16,13 +16,14 @@ Proyek ini berfokus pada pengembangan model machine learning berbasis Support Ve
 ---
 
 ## 📁 Struktur Direktori
+```bash
 Carrot-Model/
 ├── model_carrot.pkl # Model SVM yang telah dilatih
 ├── CARROT/ # Folder dataset berisi gambar wortel (good/bad)
 ├── app.py # Aplikasi Streamlit untuk deteksi kualitas
 ├── train_and_save_model.ipynb # Script pelatihan model
 └── README.md # Dokumentasi ini
-
+```
 ---
 
 ## 🛠️ Teknologi yang Digunakan
@@ -38,8 +39,8 @@ Carrot-Model/
 
 ## 👤 Author
 Dikembangkan oleh [@frenskuy](https://github.com/frenskuy)
-📧 frenkygilang@gmail.com
-🌐 [Linkedln](https://www.linkedin.com/in/frenkyy/)
+- 📧 frenkygilang@gmail.com
+- 🌐 [Linkedln](https://www.linkedin.com/in/frenkyy/)
 
 ## 🤝 Kontribusi
 Pull request dan isu baru sangat disambut! Jika Anda memiliki saran atau ingin berkontribusi, silakan fork dan submit PR Anda.
