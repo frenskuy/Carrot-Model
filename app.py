@@ -1,32 +1,39 @@
 import streamlit as st
-import numpy as np
 import cv2
-import pickle
+import numpy as np
+import joblib
+from skimage.feature import hog
 from PIL import Image
 
 # Load model
-with open('model_carrot.pkl', 'rb') as f:
-    model = pickle.load(f)
+svm_model = joblib.load("svm_model.pkl")  # pastikan file ini ada
 
-def extract_features_pil(pil_img):
-    img = pil_img.resize((64, 64))
-    img_array = np.array(img)
-    if img_array.ndim == 3:
-        features = img_array.mean(axis=(0, 1))
-    else:  # grayscale
-        features = np.array([img_array.mean()] * 3)
-    return features.reshape(1, -1)
+# Ekstrak fitur HOG
+def extract_hog_features(image):
+    image = cv2.resize(image, (128, 128))
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    features = hog(
+        gray, orientations=9, pixels_per_cell=(16, 16),
+        cells_per_block=(2, 2), block_norm='L2-Hys')
+    return features
 
-st.title("Klasifikasi Wortel Baik / Buruk 🍠🥕")
+# Streamlit UI
+st.title("Klasifikasi Wortel (Good vs Bad) 🥕")
+st.write("Upload gambar wortel untuk diklasifikasikan:")
 
-uploaded_file = st.file_uploader("Unggah gambar wortel", type=["jpg", "png", "jpeg"])
+uploaded_file = st.file_uploader("Pilih gambar...", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
-    image = Image.open(uploaded_file)
-    st.image(image, caption='Gambar diunggah', use_container_width=True)
-    
-    features = extract_features_pil(image)
-    prediction = svm.predict(features)[0]
+    image = Image.open(uploaded_file).convert("RGB")
+    st.image(image, caption='Gambar yang diupload', use_column_width=True)
 
-    label = "Wortel Baik ✅" if prediction == 1 else "Wortel Buruk ❌"
-    st.subheader(f"Prediksi: {label}")
+    # Konversi PIL ke OpenCV
+    image_cv = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+
+    # Ekstrak fitur dan prediksi
+    features = extract_hog_features(image_cv).reshape(1, -1)
+    prediction = svm_model.predict(features)[0]
+    confidence = svm_model.predict_proba(features)[0].max()
+
+    st.markdown(f"### Prediksi: `{prediction.upper()}`")
+    st.markdown(f"**Confidence:** {confidence:.2f}")
