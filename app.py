@@ -9,7 +9,7 @@ from PIL import Image
 st.set_page_config(page_title="Klasifikasi Wortel", page_icon="🥕", layout="wide")
 
 # Judul dan Deskripsi
-st.title("🥕 Klasifikasi Wortel (Good vs Bad)")
+st.markdown("<h1 style='text-align: center;'>🥕 Klasifikasi Wortel (Good vs Bad)</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center;'>Upload gambar wortel untuk mengetahui apakah wortel tersebut <b>Good</b> atau <b>Bad</b>!</p>", unsafe_allow_html=True)
 
 # Load model
