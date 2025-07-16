@@ -30,7 +30,7 @@ uploaded_file = st.file_uploader("📤 Upload gambar wortel (jpg, jpeg, png)", t
 if uploaded_file is not None:
     # Tampilkan gambar
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption='📷 Gambar yang diupload', use_container_width=True)
+    st.image(caption='📷 Gambar yang diupload', image, use_container_width=True)
 
     with st.spinner("🔍 Sedang memproses dan mengklasifikasikan gambar..."):
         # Konversi gambar
