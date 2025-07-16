@@ -43,5 +43,5 @@ Dikembangkan oleh [@frenskuy](https://github.com/frenskuy)
 - 🌐 [Linkedln](https://www.linkedin.com/in/frenkyy/)
 
 ## 🤝 Kontribusi
-Pull request dan isu baru sangat disambut! Jika Anda memiliki saran atau ingin berkontribusi, silakan fork dan submit PR Anda.
+Pull request dan isu baru sangat disambut! Jika Anda memiliki saran atau ingin berkontribusi, silakan fork dan submit projek Anda.
 
