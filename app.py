@@ -6,7 +6,7 @@ from skimage.feature import hog
 from PIL import Image
 
 # Konfigurasi halaman
-st.set_page_config(page_title="Klasifikasi Wortel", page_icon="🥕", layout="centered")
+st.set_page_config(page_title="Klasifikasi Wortel", page_icon="🥕", layout="wide")
 
 # Judul dan Deskripsi
 st.title("🥕 Klasifikasi Wortel (Good vs Bad)")
