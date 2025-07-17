@@ -16,12 +16,17 @@ st.markdown("<p style='text-align: center;'>Upload gambar wortel untuk mengetahu
 svm_model = joblib.load("model_carrot.pkl")
 
 # Fungsi ekstraksi fitur HOG
-def extract_hog_features(image):
-    image = cv2.resize(image, (128, 128))
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def extract_hog_features(image_pil):
+    image = np.array(image_pil) / 255.0
+    image_resized = resize(image, (64, 64))  # pastikan ukurannya sama
+    image_gray = rgb2gray(image_resized)
     features = hog(
-        gray, orientations=9, pixels_per_cell=(16, 16),
-        cells_per_block=(2, 2), block_norm='L2-Hys')
+        image_gray,
+        orientations=9,
+        pixels_per_cell=(8, 8),
+        cells_per_block=(2, 2),
+        block_norm='L2-Hys'
+    )
     return features
 
 # Upload gambar
