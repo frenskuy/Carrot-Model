@@ -67,3 +67,6 @@ if uploaded_file is not None:
 
     st.markdown("---")
     st.info("Model ini menggunakan fitur **MobileNetV2 + SVM** untuk mengklasifikasikan gambar wortel.")
+
+import tensorflow as tf
+st.write("TF version:", tf.__version__)
