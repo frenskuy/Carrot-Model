@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 import joblib
 from skimage.feature import hog
+from skimage.transform import resize
+from skimage.color import rgb2gray
 from PIL import Image
 
 # Konfigurasi halaman
