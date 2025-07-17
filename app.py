@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import joblib
 from PIL import Image
+import tensorflow as tf
 from tensorflow.keras.applications import MobileNetV2
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.models import Model
@@ -67,6 +68,3 @@ if uploaded_file is not None:
 
     st.markdown("---")
     st.info("Model ini menggunakan fitur **MobileNetV2 + SVM** untuk mengklasifikasikan gambar wortel.")
-
-import tensorflow as tf
-st.write("TF version:", tf.__version__)
