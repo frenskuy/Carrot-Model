@@ -1,61 +1,75 @@
 import streamlit as st
-import cv2
-import numpy as np
-import joblib
-from skimage.feature import hog
-from PIL import Image
+import torch
+import timm
+import torch.nn as nn
+from torchvision import transforms
+from PIL import Image, UnidentifiedImageError
 
 # Konfigurasi halaman
-st.set_page_config(page_title="Klasifikasi Wortel", page_icon="🥕", layout="wide")
+st.set_page_config(page_title="🥕 Klasifikasi Wortel", layout="centered")
 
-# Judul dan Deskripsi
-st.markdown("<h1 style='text-align: center;'>🥕 Klasifikasi Wortel (Good vs Bad)</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center;'>Upload gambar wortel untuk mengetahui apakah wortel tersebut <b>Good</b> atau <b>Bad</b>!</p>", unsafe_allow_html=True)
+# Load model carrot (ViT) dari file lokal
+@st.cache_resource
+def load_model():
+    model = timm.create_model("vit_tiny_patch16_224", pretrained=False, num_classes=2)
+    model.head = nn.Linear(model.head.in_features, 2)
+    model.load_state_dict(torch.load("vit_model.pth", map_location=torch.device("cpu")))
+    model.eval()
+    return model
 
-# Load model
-svm_model = joblib.load("model_carrot.pkl")
+model = load_model()
 
-# Fungsi ekstraksi fitur HOG
-def extract_hog_features(image):
-    image = cv2.resize(image, (128, 128))
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    features = hog(
-        gray, orientations=9, pixels_per_cell=(16, 16),
-        cells_per_block=(2, 2), block_norm='L2-Hys')
-    return features
+# Label klasifikasi (disesuaikan dengan label saat training)
+label_map = {0: "BAD", 1: "GOOD"}
+
+# Transformasi gambar (harus sesuai saat training)
+transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize([0.5, 0.5, 0.5],
+                         [0.5, 0.5, 0.5])  # normalisasi ke [-1, 1]
+])
+
+# Judul aplikasi
+st.markdown("<h1 style='text-align: center;'>🥕 Klasifikasi Wortel dengan Vision Transformer</h1>", unsafe_allow_html=True)
+st.write("Upload gambar wortel untuk mengetahui apakah wortel tersebut termasuk kelas **GOOD** atau **BAD** berdasarkan model Vision Transformer (ViT).")
+
+st.markdown("---")
 
 # Upload gambar
-uploaded_file = st.file_uploader("📤 Upload gambar wortel (jpg, jpeg, png)", type=["jpg", "png", "jpeg"])
+uploaded_file = st.file_uploader("📤 Upload gambar wortel (JPG, PNG, dll)", type=["jpg", "jpeg", "png", "bmp", "webp", "tiff"])
 
+# Jika ada file gambar
 if uploaded_file is not None:
-    # Tampilkan gambar
-    image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption='📷 Gambar yang diupload', use_container_width=True)
+    try:
+        image = Image.open(uploaded_file).convert("RGB")
+        st.image(image, caption="📷 Gambar yang Diunggah", use_container_width=True)
 
-    with st.spinner("🔍 Sedang memproses dan mengklasifikasikan gambar..."):
-        # Konversi gambar
-        image_cv = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-        features = extract_hog_features(image_cv).reshape(1, -1)
+        st.markdown("### 🔍 Hasil Prediksi")
 
-        # Prediksi
-        prediction = svm_model.predict(features)[0]
-        confidence = svm_model.predict_proba(features)[0].max()
+        # Preprocessing
+        input_tensor = transform(image).unsqueeze(0)
 
-    # Hasil prediksi
-    st.markdown("---")
-    col1, col2 = st.columns(2)
+        # Prediksi model
+        with torch.no_grad():
+            output = model(input_tensor)
+            probabilities = torch.softmax(output, dim=1)[0]
+            pred_class = torch.argmax(probabilities).item()
+            confidence = probabilities[pred_class].item()
+            label = label_map.get(pred_class, "UNKNOWN")
 
-    with col1:
-        st.markdown("### 🔎 Hasil Prediksi:")
-        if prediction.lower() == "good":
-            st.success(f"Wortel ini diprediksi sebagai: **GOOD** 🟢")
+        # Tampilkan hasil
+        if label == "GOOD":
+            st.success(f"✅ Wortel ini diprediksi sebagai: **GOOD** dengan keyakinan {confidence:.2%}")
+        elif label == "BAD":
+            st.error(f"❌ Wortel ini diprediksi sebagai: **BAD** dengan keyakinan {confidence:.2%}")
         else:
-            st.error(f"Wortel ini diprediksi sebagai: **BAD** 🔴")
+            st.warning(f"⚠️ Kelas tidak dikenali: {pred_class}")
 
-    with col2:
-        st.markdown("### 📊 Confidence:")
-        st.progress(confidence)
-        st.write(f"**{confidence * 100:.2f}%** keyakinan model terhadap hasil prediksi.")
+        st.markdown("---")
+        st.info("Model ini dilatih menggunakan Vision Transformer (`vit_base_patch16_224`) dengan dataset wortel yang dibagi menjadi dua kelas: GOOD dan BAD.")
 
-    st.markdown("---")
-    st.info("Model ini menggunakan fitur HOG + SVM untuk mengklasifikasikan gambar wortel.")
+    except UnidentifiedImageError:
+        st.error("❗ Gambar tidak valid atau rusak.")
+    except Exception as e:
+        st.error(f"❗ Terjadi error: {e}")
