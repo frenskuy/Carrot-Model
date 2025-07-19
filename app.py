@@ -19,15 +19,12 @@ def load_model():
 
 model = load_model()
 
-# Label klasifikasi (disesuaikan dengan label saat training)
-label_map = {0: "BAD", 1: "GOOD"}
-
 # Transformasi gambar (harus sesuai saat training)
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
-    transforms.Normalize([0.5, 0.5, 0.5],
-                         [0.5, 0.5, 0.5])  # normalisasi ke [-1, 1]
+    transforms.Normalize([0.485, 0.456, 0.406],
+                         [0.229, 0.224, 0.225])
 ])
 
 # Judul aplikasi
@@ -50,24 +47,38 @@ if uploaded_file is not None:
         # Preprocessing
         input_tensor = transform(image).unsqueeze(0)
 
-        # Prediksi model
+        # Preprocess and predict
+        img_tensor = transform(image).unsqueeze(0)
         with torch.no_grad():
-            output = model(input_tensor)
+            output = model(img_tensor)
             probabilities = torch.softmax(output, dim=1)[0]
-            pred_class = torch.argmax(probabilities).item()
-            confidence = probabilities[pred_class].item()
-            label = label_map.get(pred_class, "UNKNOWN")
+            predicted_class = torch.argmax(probabilities).item()
 
-        # Tampilkan hasil
-        if label == "GOOD":
-            st.success(f"✅ Wortel ini diprediksi sebagai: **GOOD** dengan keyakinan {confidence:.2%}")
-        elif label == "BAD":
-            st.error(f"❌ Wortel ini diprediksi sebagai: **BAD** dengan keyakinan {confidence:.2%}")
+        class_labels = ["BAD", "GOOD"]
+        confidence = probabilities[predicted_class].item()
+
+        # Confidence threshold to determine if image might be neither
+        confidence_threshold = 0.75
+
+        if confidence < confidence_threshold:
+            st.markdown(
+                f"<div style='font-size: 20px; font-weight: bold; color: orange;'>Class: Neither BAD or GOOD</div>",
+                unsafe_allow_html=True
+            )
+            st.markdown(
+                f"<div style='font-size: 16px;'>The model is not confident enough to classify this image as a BAD or GOOD (Confidence: {confidence:.2%}).</div>",
+                unsafe_allow_html=True
+            )
         else:
-            st.warning(f"⚠️ Kelas tidak dikenali: {pred_class}")
+            st.markdown(
+                f"<div style='font-size: 20px; font-weight: bold;'>Class: {class_labels[predicted_class]}</div>",
+                unsafe_allow_html=True
+            )
+            st.markdown(
+                f"<div style='font-size: 16px;'>Confidence: {confidence:.2%}</div>",
+                unsafe_allow_html=True
+            )
 
-        st.markdown("---")
-        st.info("Model ini dilatih menggunakan Vision Transformer (`vit_base_patch16_224`) dengan dataset wortel yang dibagi menjadi dua kelas: GOOD dan BAD.")
 
     except UnidentifiedImageError:
         st.error("❗ Gambar tidak valid atau rusak.")
