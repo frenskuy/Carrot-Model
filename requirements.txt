@@ -1,7 +1,5 @@
 streamlit
-opencv-python
-scikit-image
-scikit-learn
-numpy
+torch
+torchvision
+timm
 Pillow
-joblib
