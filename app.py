@@ -70,7 +70,7 @@ uploaded_file = st.file_uploader("Pilih gambar wortel", type=["jpg", "jpeg", "pn
 if uploaded_file is not None:
     try:
         img = Image.open(uploaded_file)
-        st.image(img, caption="Gambar yang diunggah", use_column_width=True)
+        st.image(img, caption="Gambar yang diunggah", use_container_width=True)
 
         input_tensor = preprocess_image(img)
 
